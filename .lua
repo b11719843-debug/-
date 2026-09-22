@@ -1,5 +1,5 @@
 -- СКРИПТ ХАБ ЛООЛ🤣💪 by @megoden111
--- Custom GUI | No Libraries
+-- Full Build with Floating Mobile Button
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -9,7 +9,6 @@ local TeleportService = game:GetService("TeleportService")
 local LocalPlayer = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
 
--- ===================== НАСТРОЙКИ =====================
 local Settings = {
     Aimbot = false, AimTeamCheck = true, AimPart = "Head",
     AimSmooth = 0.15, AimFOV = 150, WallCheck = false, FOVCircle = false,
@@ -53,15 +52,12 @@ local function HasLOS(part)
 end
 
 -- ===================== ЛОГИКА =====================
-
--- FOV Circle
 local fovCircle = Drawing.new("Circle")
 fovCircle.Thickness = 1.5
 fovCircle.Transparency = 1
 fovCircle.Color = Color3.fromRGB(200, 200, 200)
 fovCircle.Filled = false
 
--- Aim Target
 local function GetTarget()
     local closest, shortest = nil, Settings.AimFOV
     local mousePos = UserInputService:GetMouseLocation()
@@ -82,7 +78,6 @@ local function GetTarget()
     return closest
 end
 
--- ESP Cache
 local ESPData = {}
 local function CreateESP(plr)
     local data = {
@@ -120,14 +115,12 @@ RunService.RenderStepped:Connect(function()
     local myChar = LocalPlayer.Character
     local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
 
-    -- FOV Circle
     fovCircle.Visible = Settings.FOVCircle
     if Settings.FOVCircle then
         fovCircle.Radius = Settings.AimFOV
         fovCircle.Position = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
     end
 
-    -- Aimbot
     if Settings.Aimbot and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
         local t = GetTarget()
         if t then
@@ -135,7 +128,6 @@ RunService.RenderStepped:Connect(function()
         end
     end
 
-    -- Hitbox
     if Settings.Hitbox then
         for _, plr in pairs(Players:GetPlayers()) do
             if plr ~= LocalPlayer then
@@ -160,7 +152,6 @@ RunService.RenderStepped:Connect(function()
         end
     end
 
-    -- ESP
     if Settings.ESP then
         for _, plr in pairs(Players:GetPlayers()) do
             local char, hrp, hum = GetChar(plr)
@@ -185,19 +176,16 @@ RunService.RenderStepped:Connect(function()
                                 data.box.Position = Vector2.new(x, y)
                                 data.box.Size = Vector2.new(w, h)
                             end
-
                             data.name.Visible = Settings.ESPName
                             if Settings.ESPName then
                                 data.name.Position = Vector2.new(tS.X, y - 18)
                                 data.name.Text = plr.Name
                             end
-
                             data.dist.Visible = Settings.ESPDist
                             if Settings.ESPDist then
                                 data.dist.Position = Vector2.new(tS.X, y + h + 4)
                                 data.dist.Text = string.format("[%d]", math.floor(d))
                             end
-
                             data.healthBg.Visible = Settings.ESPHealth
                             data.healthBar.Visible = Settings.ESPHealth
                             if Settings.ESPHealth then
@@ -207,13 +195,11 @@ RunService.RenderStepped:Connect(function()
                                 data.healthBar.Position = Vector2.new(bx, y + h*(1-hp)) data.healthBar.Size = Vector2.new(4, h*hp)
                                 data.healthBar.Color = Color3.fromRGB(math.floor(255*(1-hp)), math.floor(255*hp), 0)
                             end
-
                             data.tracer.Visible = Settings.ESPTracer
                             if Settings.ESPTracer then
                                 data.tracer.From = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y)
                                 data.tracer.To = Vector2.new(tS.X, y + h)
                             end
-
                             if Settings.ESPChams then
                                 if not data.highlight then
                                     local hl = Instance.new("Highlight")
@@ -234,7 +220,6 @@ RunService.RenderStepped:Connect(function()
         if next(ESPData) ~= nil then for plr, _ in pairs(ESPData) do DestroyESP(plr) end end
     end
 
-    -- Speed / Jump / Gravity
     if myChar then
         local hum = myChar:FindFirstChildOfClass("Humanoid")
         if hum then
@@ -244,18 +229,15 @@ RunService.RenderStepped:Connect(function()
         end
     end
 
-    -- Noclip
     if Settings.Noclip and myChar then
         for _, part in pairs(myChar:GetDescendants()) do
             if part:IsA("BasePart") and part.CanCollide then part.CanCollide = false end
         end
     end
 
-    -- Third Person
     LocalPlayer.CameraMaxZoomDistance = Settings.ThirdPerson and Settings.TPDist or 12.5
 end)
 
--- Inf Jump
 UserInputService.JumpRequest:Connect(function()
     if Settings.InfJump and LocalPlayer.Character then
         local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
@@ -263,7 +245,6 @@ UserInputService.JumpRequest:Connect(function()
     end
 end)
 
--- BHop
 RunService.Heartbeat:Connect(function()
     if Settings.BHop and LocalPlayer.Character then
         local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
@@ -273,7 +254,6 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
--- Fly
 local flyConn, bodyVel, bodyGyro
 local function StopFly()
     if flyConn then flyConn:Disconnect() flyConn = nil end
@@ -303,7 +283,6 @@ RunService.RenderStepped:Connect(function()
     elseif not Settings.Fly then StopFly() end
 end)
 
--- Anti Ragdoll
 LocalPlayer.CharacterAdded:Connect(function(char)
     local hum = char:WaitForChild("Humanoid")
     hum.StateChanged:Connect(function(_, new)
@@ -313,7 +292,6 @@ LocalPlayer.CharacterAdded:Connect(function(char)
     end)
 end)
 
--- Anti AFK
 LocalPlayer.Idled:Connect(function()
     if Settings.AntiAFK then
         game:GetService("VirtualUser"):CaptureController()
@@ -321,7 +299,6 @@ LocalPlayer.Idled:Connect(function()
     end
 end)
 
--- Cleanup
 Players.PlayerRemoving:Connect(function(plr) DestroyESP(plr) HitboxOrig[plr] = nil end)
 
 -- ===================== МЕНЮ =====================
@@ -331,7 +308,6 @@ ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
--- Главный фрейм
 local Main = Instance.new("Frame")
 Main.Size = UDim2.new(0, 320, 0, 400)
 Main.Position = UDim2.new(0.5, -160, 0.5, -200)
@@ -342,16 +318,9 @@ Main.Draggable = true
 Main.Visible = false
 Main.Parent = ScreenGui
 
-local MC = Instance.new("UICorner")
-MC.CornerRadius = UDim.new(0, 10)
-MC.Parent = Main
+local MC = Instance.new("UICorner") MC.CornerRadius = UDim.new(0, 10) MC.Parent = Main
+local MS = Instance.new("UIStroke") MS.Color = Color3.fromRGB(150, 100, 255) MS.Thickness = 1.5 MS.Parent = Main
 
-local MS = Instance.new("UIStroke")
-MS.Color = Color3.fromRGB(150, 100, 255)
-MS.Thickness = 1.5
-MS.Parent = Main
-
--- Заголовок
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 40)
 Title.BackgroundColor3 = Color3.fromRGB(35, 30, 45)
@@ -362,9 +331,7 @@ Title.TextSize = 16
 Title.Font = Enum.Font.GothamBold
 Title.Parent = Main
 
-local TC = Instance.new("UICorner")
-TC.CornerRadius = UDim.new(0, 10)
-TC.Parent = Title
+local TC = Instance.new("UICorner") TC.CornerRadius = UDim.new(0, 10) TC.Parent = Title
 
 local Sub = Instance.new("TextLabel")
 Sub.Size = UDim2.new(1, 0, 0, 16)
@@ -376,7 +343,6 @@ Sub.TextSize = 11
 Sub.Font = Enum.Font.Gotham
 Sub.Parent = Main
 
--- Кнопка закрытия
 local CloseBtn = Instance.new("TextButton")
 CloseBtn.Size = UDim2.new(0, 30, 0, 30)
 CloseBtn.Position = UDim2.new(1, -35, 0, 5)
@@ -388,13 +354,10 @@ CloseBtn.TextSize = 16
 CloseBtn.Font = Enum.Font.GothamBold
 CloseBtn.Parent = Title
 
-local CC = Instance.new("UICorner")
-CC.CornerRadius = UDim.new(0, 6)
-CC.Parent = CloseBtn
+local CC = Instance.new("UICorner") CC.CornerRadius = UDim.new(0, 6) CC.Parent = CloseBtn
 
 CloseBtn.MouseButton1Click:Connect(function() Main.Visible = false end)
 
--- Скроллинг для содержимого
 local ScrollFrame = Instance.new("ScrollingFrame")
 ScrollFrame.Size = UDim2.new(1, 0, 1, -60)
 ScrollFrame.Position = UDim2.new(0, 0, 0, 60)
@@ -418,7 +381,6 @@ Pad.PaddingLeft = UDim.new(0, 10)
 Pad.PaddingRight = UDim.new(0, 10)
 Pad.Parent = ScrollFrame
 
--- Функции создания элементов
 local function CreateSection(text)
     local Sec = Instance.new("TextLabel")
     Sec.Size = UDim2.new(1, 0, 0, 22)
@@ -428,7 +390,6 @@ local function CreateSection(text)
     Sec.TextSize = 12
     Sec.Font = Enum.Font.GothamBold
     Sec.TextXAlignment = Enum.TextXAlignment.Left
-    Sec.LayoutOrder = 1
     Sec.Parent = ScrollFrame
 end
 
@@ -447,9 +408,7 @@ local function CreateToggle(text, default, callback)
     Btn.LayoutOrder = toggleOrder + 100
     Btn.Parent = ScrollFrame
 
-    local C = Instance.new("UICorner")
-    C.CornerRadius = UDim.new(0, 6)
-    C.Parent = Btn
+    local C = Instance.new("UICorner") C.CornerRadius = UDim.new(0, 6) C.Parent = Btn
 
     local state = default
     Btn.MouseButton1Click:Connect(function()
@@ -469,9 +428,7 @@ local function CreateSlider(text, minV, maxV, default, callback)
     Container.LayoutOrder = toggleOrder + 100
     Container.Parent = ScrollFrame
 
-    local CC = Instance.new("UICorner")
-    CC.CornerRadius = UDim.new(0, 6)
-    CC.Parent = Container
+    local CC2 = Instance.new("UICorner") CC2.CornerRadius = UDim.new(0, 6) CC2.Parent = Container
 
     local Label = Instance.new("TextLabel")
     Label.Size = UDim2.new(1, -10, 0, 18)
@@ -491,9 +448,7 @@ local function CreateSlider(text, minV, maxV, default, callback)
     Bar.BorderSizePixel = 0
     Bar.Parent = Container
 
-    local BC = Instance.new("UICorner")
-    BC.CornerRadius = UDim.new(1, 0)
-    BC.Parent = Bar
+    local BC = Instance.new("UICorner") BC.CornerRadius = UDim.new(1, 0) BC.Parent = Bar
 
     local Fill = Instance.new("Frame")
     Fill.Size = UDim2.new((default - minV) / (maxV - minV), 0, 1, 0)
@@ -501,9 +456,7 @@ local function CreateSlider(text, minV, maxV, default, callback)
     Fill.BorderSizePixel = 0
     Fill.Parent = Bar
 
-    local FC = Instance.new("UICorner")
-    FC.CornerRadius = UDim.new(1, 0)
-    FC.Parent = Fill
+    local FC = Instance.new("UICorner") FC.CornerRadius = UDim.new(1, 0) FC.Parent = Fill
 
     local dragging = false
     local function Update(input)
@@ -511,4 +464,15 @@ local function CreateSlider(text, minV, maxV, default, callback)
         local val = minV + (maxV - minV) * rel
         val = math.floor(val * 100 + 0.5) / 100
         Fill.Size = UDim2.new(rel, 0, 1, 0)
-        Label.Text = t
+        Label.Text = text .. ": " .. tostring(val)
+        callback(val)
+    end
+
+    Bar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            Update(input)
+        end
+    end)
+    Bar.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.
